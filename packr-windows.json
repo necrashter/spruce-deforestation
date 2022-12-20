@@ -1,0 +1,19 @@
+{
+    "platform": "windows64",
+    "jdk": "../OpenJDK11U-jre_x64_windows_hotspot_11.0.17_8.zip",
+    "executable": "spruce-deforestation",
+    "classpath": [
+        "./desktop/build/libs/desktop-1.0.jar"
+    ],
+    "removelibs": [
+        "./desktop/build/libs/desktop-1.0.jar"
+    ],
+    "mainclass": "com.mygdx.game.DesktopLauncher",
+    "vmargs": [
+    ],
+    "resources": [
+        "assets"
+    ],
+    "minimizejre": "soft",
+    "output": "build-windows"
+}
