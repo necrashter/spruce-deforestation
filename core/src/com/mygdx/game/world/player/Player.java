@@ -25,6 +25,10 @@ public class Player extends GameEntity {
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                 jump();
             }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                shouldReload = true;
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) useKeyPressed();
         }
 
         @Override
@@ -155,6 +159,7 @@ public class Player extends GameEntity {
     public int activeWeaponIndex = -1;
     public PlayerWeapon activeWeapon = null;
     public boolean firing1 = false;
+    public boolean shouldReload = false;
 
     public Player(final GameWorld world) {
         super(world, PLAYER_HEIGHT, PLAYER_HEIGHT/4.0f);
@@ -192,7 +197,6 @@ public class Player extends GameEntity {
         if (!inputAdapter.disabled) inputAdapter.update(delta);
         aim = getAim();
         aimIntersection.set(world.intersectRay(aim, this));
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) useKeyPressed();
 
         camera.direction.set(forward);
         camera.up.set(Vector3.Y);
@@ -230,6 +234,7 @@ public class Player extends GameEntity {
     }
 
     public void equipWeapon(int i) {
+        shouldReload = false;
         i = MathUtils.clamp(i, 0, weapons.size - 1);
         activeWeaponIndex = i;
         activeWeapon = weapons.get(i);

@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -116,13 +117,28 @@ public class GameScreen implements Screen {
             labelContainer1.center().bottom().padBottom(80f);
             subtitleGroup.addActor(labelContainer1);
 
-            Label label1 = new Label("Press SPACE to continue...", game.skin, "old-font", Color.WHITE);
-            Container<Label> labelContainer2 = new Container<>(label1);
-            labelContainer2.setFillParent(true);
-            labelContainer2.center().bottom().padBottom(10f);
-            subtitleGroup.addActor(labelContainer2);
+            if (MyGdxGame.isMobile()) {
+                TextButton nextButton = new TextButton("Next", game.skin);
+                nextButton.addListener(new InputListener() {
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        if (activeSubtitle != null) activeSubtitle.shouldFade = true;
+                        return true;
+                    }
+                });
+                Container<TextButton> nextButtonContainer = new Container<>(nextButton);
+                nextButtonContainer.setFillParent(true);
+                nextButtonContainer.pad(40).align(Align.right | Align.center);
+                subtitleGroup.addActor(nextButtonContainer);
+            } else {
+                Label label1 = new Label("Press SPACE to continue...", game.skin, "old-font", Color.WHITE);
+                Container<Label> labelContainer2 = new Container<>(label1);
+                labelContainer2.setFillParent(true);
+                labelContainer2.center().bottom().padBottom(10f);
+                subtitleGroup.addActor(labelContainer2);
+            }
 
-            stage.addActor(subtitleGroup);
+//            stage.addActor(subtitleGroup);
 
             subtitleGroup.setColor(1, 1, 1, 0);
         }
@@ -175,20 +191,22 @@ public class GameScreen implements Screen {
             Container<Touchpad> movementTouchContainer = new Container<>(movementTouch);
             movementTouchContainer.setFillParent(true);
             movementTouchContainer.bottom().left().pad(20).size(touchpadSize);
-            stage.addActor(movementTouchContainer);
+            hudGroup.addActor(movementTouchContainer);
 
             TextButton shootButton = new TextButton("JUMP", game.skin);
             shootButton.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    world.player.jump();
+                    if (!world.player.inputAdapter.disabled) {
+                        world.player.jump();
+                    }
                     return true;
                 }
             });
             Container<TextButton> shootButtonContainer = new Container<>(shootButton);
             shootButtonContainer.setFillParent(true);
             shootButtonContainer.pad(40).align(Align.bottomRight);
-            stage.addActor(shootButtonContainer);
+            hudGroup.addActor(shootButtonContainer);
 
             TextButton menuButton = new TextButton("Menu", game.skin);
             menuButton.addListener(new ClickListener() {
@@ -199,8 +217,37 @@ public class GameScreen implements Screen {
             });
             Container<TextButton> menuButtonContainer = new Container<>(menuButton);
             menuButtonContainer.setFillParent(true);
-            menuButtonContainer.pad(20).align(Align.topRight);
+            menuButtonContainer.pad(20).align(Align.center | Align.top);
             stage.addActor(menuButtonContainer);
+
+            TextButton useButton = new TextButton("USE", game.skin);
+            useButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    world.player.useKeyPressed();
+                }
+            });
+            TextButton reloadButton = new TextButton("RELOAD", game.skin);
+            reloadButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    world.player.shouldReload = true;
+                }
+            });
+            TextButton nextWeaponButton = new TextButton("SWITCH", game.skin);
+            nextWeaponButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    world.player.nextWeapon();
+                }
+            });
+            Table topLeftTable = new Table(game.skin);
+            topLeftTable.setFillParent(true);
+            topLeftTable.pad(20).align(Align.topRight);
+            topLeftTable.add(useButton).pad(5).row();
+            topLeftTable.add(nextWeaponButton).pad(5).row();
+            topLeftTable.add(reloadButton).pad(5).row();
+            hudGroup.addActor(topLeftTable);
         }
         setPaused(false);
 
@@ -417,9 +464,10 @@ public class GameScreen implements Screen {
         dispose();
     }
 
-    private boolean subtitleActive = false;
+    private SubtitleScriptedEvent activeSubtitle = null;
     public class SubtitleScriptedEvent implements ScriptedEvent {
         final String text;
+        boolean shouldFade = false;
 
         public SubtitleScriptedEvent(String text) {
             this.text = text;
@@ -427,21 +475,25 @@ public class GameScreen implements Screen {
 
         @Override
         public void activate() {
+            activeSubtitle = this;
             subtitleLabel.setText(text);
-            if (subtitleGroup.hasActions()) {
+            if (subtitleGroup.getStage() == stage) {
                 hudGroup.clearActions();
                 subtitleGroup.clearActions();
                 return;
             }
             hudGroup.addAction(Actions.fadeOut(0.3f));
+            stage.addActor(subtitleGroup);
             subtitleGroup.addAction(Actions.fadeIn(0.3f));
         }
 
         @Override
         public boolean update(float delta) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || shouldFade) {
+                activeSubtitle = null;
                 hudGroup.addAction(Actions.fadeIn(0.3f));
                 subtitleGroup.addAction(Actions.fadeOut(0.3f));
+                subtitleGroup.addAction(Actions.removeActor());
                 return true;
             }
             return false;

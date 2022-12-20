@@ -89,7 +89,8 @@ public class Firearm extends PlayerWeapon {
                 } else if (player.aimIntersection.entity != null) {
                     player.aimIntersection.entity.takeDamage(damage, Damageable.DamageAgent.Player, Damageable.DamageSource.Firearm);
                 }
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.R) && ammoInClip < maxAmmoInClip) {
+            } else if (player.shouldReload && ammoInClip < maxAmmoInClip) {
+                player.shouldReload = false;
                 beginReload();
             }
         } else if (state == State.Reloading) {
