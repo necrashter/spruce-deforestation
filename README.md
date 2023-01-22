@@ -10,6 +10,8 @@ See libGDX documentation for information on how to build.
 
 ## Assets
 
+You can find the original .blend files and textures in [OpenGameArt](https://opengameart.org/content/spruce-deforestation-models).
+
 Model importing from Blender:
 - FBX export with 0.125 scale for `all.blend`, 1/32 scale for NPCs.
 - `fbx-conv -f`
