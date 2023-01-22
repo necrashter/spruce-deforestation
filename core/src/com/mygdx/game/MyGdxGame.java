@@ -54,8 +54,7 @@ public class MyGdxGame extends Game {
 	}
 
 	public static boolean isMobile() {
-		return true;
-//		return Gdx.app.getType().equals(Application.ApplicationType.Android) || Gdx.app.getType().equals(Application.ApplicationType.iOS);
+		return Gdx.app.getType().equals(Application.ApplicationType.Android) || Gdx.app.getType().equals(Application.ApplicationType.iOS);
 	}
 
 	public Screen getLevel(int level, float easiness) {
