@@ -8,7 +8,7 @@
     "removelibs": [
         "./desktop/build/libs/desktop-1.0.jar"
     ],
-    "mainclass": "com.mygdx.game.DesktopLauncher",
+    "mainclass": "com.spruce.game.DesktopLauncher",
     "vmargs": [
     ],
     "resources": [
