@@ -5,7 +5,13 @@ Spruce Deforestation is a FPS game in which you serve the totalitarian governmen
 Available on [itch.io](https://necrashter.itch.io/spruce-deforestation) with web and desktop builds.
 Originally made for libGDX Jam 23.
 
-See libGDX documentation for information on how to build.
+## Build & Run
+
+```
+./gradlew desktop:run
+```
+
+See [libGDX documentation](https://libgdx.com/wiki/deployment/deploying-your-application) for more information.
 
 
 ## Assets
